@@ -1,6 +1,11 @@
 # PiDGC
 Raspberry Pi based Digital Gauge Cluster by Josh Ellis / josh@ellis.sh
 
+*** Please Note: This library is designed for, and without heavy modification, will not work on anything other than 
+the Raspberry Pi 4B running a 2021 version of RaspiOS (in my case `2021-05-07-raspios-buster-armhf-lite.img`). There are
+files compiled specifically for this architecture. Additionally, this is hardcoded to support a 1280x480 display. It 
+will look weird on other displays. ***
+
 Setup steps on Buster Lite:
 - raspi-config
   - System Options
