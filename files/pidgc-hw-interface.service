@@ -1,0 +1,13 @@
+[Unit]
+Description=PiDGC Hardware Interface
+After=graphical.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/pidgc
+ExecStart=java -jar /home/pi/pidgc/hw-interface.jar
+
+[Install]
+WantedBy=multi-user.target
+
