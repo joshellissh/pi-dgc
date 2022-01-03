@@ -53,8 +53,16 @@ void sendOdometerValues() {
   float tripOdometer = readMileage(TRIP);
   float odometer = readMileage(REGULAR);
 
-  char output[25] = {0};
+  char output[512] = {0};
   sprintf(output, "odo:%f,%f", tripOdometer, odometer);
+  Serial.println(output);
+  
+  sprintf(
+    output, 
+    "log:SERIAL_LOG-Odometer values requested. Returning (trip %f / odometer %f)",
+    tripOdometer,
+    odometer
+  );
   Serial.println(output);
 }
 
@@ -71,7 +79,14 @@ void writePPM(int ppm) {
 void sendPPM() {
   int ppm = readPPM();
 
-  char output[25] = {0};
+  char output[512] = {0};
   sprintf(output, "ppm:%d", ppm);
+  Serial.println(output);
+  
+  sprintf(
+    output, 
+    "log:SERIAL_LOG-PPM value requested. Returning %d",
+    ppm
+  );
   Serial.println(output);
 }

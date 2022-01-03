@@ -4,6 +4,7 @@
 #include <QJsonObject>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QJsonDocument>
 
 /**
  * @brief This is NOT the right way to implement a thread safe data class in C++.
@@ -19,8 +20,11 @@ public:
 
     bool initialized = false;
     bool resetTrip = false;
+    bool writePPM = false;
+    int newPPM = 8000;
 
     void deserialize(const QJsonObject &json);
+    QString serialize();
     void reset();
 
     void setBoost(float boost) { QMutexLocker locker(&mutex); this->boost = boost; }
@@ -45,16 +49,21 @@ public:
     float getOdometer() { QMutexLocker locker(&mutex); return this->odometer; }
     void setOilPressure(float oilPressure) { QMutexLocker locker(&mutex); this->oilPressure = oilPressure; }
     float getOilPressure() { QMutexLocker locker(&mutex); return this->oilPressure; }
+    void setPPM(int ppm) { QMutexLocker locker(&mutex); this->ppm = ppm; }
+    float getPPM() { QMutexLocker locker(&mutex); return this->ppm; }
     void setReverse(bool reverse) { QMutexLocker locker(&mutex); this->reverse = reverse; }
     bool getReverse() { QMutexLocker locker(&mutex); return this->reverse; }
     void setRightBlinker(bool rightBlinker) { QMutexLocker locker(&mutex); this->rightBlinker = rightBlinker; }
     bool getRightBlinker() { QMutexLocker locker(&mutex); return this->rightBlinker; }
     void setRpm(float rpm) { QMutexLocker locker(&mutex); this->rpm = rpm; }
     float getRpm() { QMutexLocker locker(&mutex); return this->rpm; }
+    void setSerialConnected(bool serialConnected) { QMutexLocker locker(&mutex); this->serialConnected = serialConnected; }
+    bool getSerialConnected() { QMutexLocker locker(&mutex); return this->serialConnected; }
     void setTripOdometer(float tripOdometer) { QMutexLocker locker(&mutex); this->tripOdometer = tripOdometer; }
     float getTripOdometer() { QMutexLocker locker(&mutex); return this->tripOdometer; }
     void setVoltage(float voltage) { QMutexLocker locker(&mutex); this->voltage = voltage; }
     float getVoltage() { QMutexLocker locker(&mutex); return this->voltage; }
+
 
 private:
     mutable QMutex mutex;
@@ -70,9 +79,11 @@ private:
     float mph;
     float odometer;
     float oilPressure;
+    int ppm;
     bool reverse;
     bool rightBlinker;
     float rpm;
+    bool serialConnected;
     float tripOdometer;
     float voltage;
 };

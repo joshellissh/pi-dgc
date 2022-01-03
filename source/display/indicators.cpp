@@ -14,4 +14,5 @@ Indicators::Indicators()
     boostLaggingMax = false;
     boostLaggingMaxOpacity = 0.0f;
     shiftLight = false;
+    serialConnected = false;
 }

@@ -45,7 +45,6 @@ object State {
     @set:Synchronized @get:Synchronized
     var odometer: Double = 0.0
 
-    @JsonIgnore
     @set:Synchronized @get:Synchronized
     var vssPulsesPerMile: Int = 0
 
@@ -57,6 +56,9 @@ object State {
 
     @set:Synchronized @get:Synchronized
     var rpm: Int = 0
+
+    @set:Synchronized @get:Synchronized
+    var serialConnected: Boolean = false
 
     @JsonIgnore
     @set:Synchronized @get:Synchronized

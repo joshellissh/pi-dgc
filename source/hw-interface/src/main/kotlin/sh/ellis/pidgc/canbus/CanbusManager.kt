@@ -42,10 +42,6 @@ class CanbusManager: Runnable {
                     it.write(makeCanRequest(0x0B))
                     readResponse(it)
 
-                    // Request MIL status
-                    it.write(makeCanRequest(0x01))
-                    readResponse(it)
-
                     lastLowRes = currentTime
                 }
 
@@ -106,16 +102,6 @@ class CanbusManager: Runnable {
                     }
 
                     State.boost = (data[3].toUByte().toInt().toDouble() * 0.145038) - State.barometricPressure;
-                }
-
-                // MIL
-                0x01 -> {
-                    if (length != 6) {
-                        println("MIL message length != 6: $length")
-                        return
-                    }
-
-                    State.mil = data[3].toUByte().msb.toUInt() == (0xF).toUInt()
                 }
 
                 // Barometric pressure

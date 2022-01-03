@@ -1,6 +1,5 @@
 #include "painter.h"
 #include "converters.h"
-#include <QCameraInfo>
 #include <QList>
 #include <QActionGroup>
 
@@ -13,9 +12,9 @@ Painter::Painter(VehicleValues &vehicle)
     backgroundBrush = QBrush(QColor(0, 0, 0));
     shiftLightBrush = QBrush(QColor(255, 0, 0));
 
-    largeGauge.setFamily("bladitwo4fitalic");
+    largeGauge.setFamily("BladiTwo4F-Italic");
     largeGauge.setPointSize(30);
-    smallGauge.setFamily("bladitwo4fitalic");
+    smallGauge.setFamily("BladiTwo4F-Italic");
     smallGauge.setPointSize(15);
     normalText.setFamily("Arial");
     normalText.setPointSize(12);
@@ -25,21 +24,9 @@ Painter::Painter(VehicleValues &vehicle)
 
     // Load all gauge cluster images
     images = loadImages(QString("%1/images/").arg(QCoreApplication::applicationDirPath()));
-
-    // List cameras
-    const QList<QCameraInfo> availableCameras = QCameraInfo::availableCameras();
-    for (const QCameraInfo &cameraInfo : availableCameras) {
-        qDebug() << "Camera:" << cameraInfo.description();
-    }
-
-    // Start camera
-    camera = new QCamera(QCamera::FrontFace);
-    imageCapture = new QCameraImageCapture(camera);
-    connect(imageCapture, &QCameraImageCapture::imageCaptured, this, &Painter::processCapturedImage);
-    camera->start();
 }
 
-void Painter::paint(QPainter *painter, QPaintEvent *event, int elapsed)
+void Painter::paint(QPainter *painter, QPaintEvent *event)
 {
     if (indicators.shiftLight)
         painter->fillRect(event->rect(), shiftLightBrush);
@@ -111,19 +98,15 @@ void Painter::paint(QPainter *painter, QPaintEvent *event, int elapsed)
     drawCenteredWithOffsetAndRotation(painter, images->at("little_needle.png"), 1031.0, 240.0, -191.0, 0.0, pressureToAngle(vehicle->getOilPressure()));
 
     // Center logo
-    if (!vehicle->getReverse()) {
-        painter->setOpacity(0.8f);
-        drawCenteredAt(painter, images->at("center_logo.png"), 640.0, 240.0);
-        painter->setOpacity(1.0f);
-    } else {
-        imageCapture->capture();
-    }
+    painter->setOpacity(0.8f);
+    drawCenteredAt(painter, images->at("center_logo.png"), 640.0, 240.0);
+    painter->setOpacity(1.0f);
 
-    // Left indicator
+    // Left blinker indicator
     if (indicators.left)
         drawCenteredAt(painter, images->at("left_indicator.png"), 490.0, 115.0);
 
-    // Right indicator
+    // Right blinker indicator
     if (indicators.right)
         drawCenteredAt(painter, images->at("right_indicator.png"), 790.0, 115.0);
 
@@ -160,6 +143,14 @@ void Painter::paint(QPainter *painter, QPaintEvent *event, int elapsed)
     drawCenteredAt(painter, images->at("reset.png"), 410.0, 423.0);
     painter->setOpacity(1.0);
 
+    // Microcontroller icon
+    if (indicators.serialConnected)
+        painter->setOpacity(0.8);
+    else
+        painter->setOpacity(0.3);
+    drawCenteredAt(painter, images->at("microcontroller.png"), 1240.0, 33.0);
+    painter->setOpacity(1.0);
+
     painter->setPen(gaugeTextPen);
     painter->setFont(largeGauge);
     // RPM
@@ -172,6 +163,7 @@ void Painter::paint(QPainter *painter, QPaintEvent *event, int elapsed)
     // Battery voltage
     QString voltage;
     voltage.sprintf("%.1f", vehicle->getVoltage());
+    painter->setFont(smallGauge);
     painter->drawText(1031.0f - 20.0f, 388.5f - 10.0f, 40.0f, 20.0f, Qt::AlignCenter | Qt::AlignHCenter, voltage);
 
     painter->setFont(normalText);
@@ -192,8 +184,6 @@ void Painter::paint(QPainter *painter, QPaintEvent *event, int elapsed)
     painter->setOpacity(1.0);
 
     // Frame counter
-//    painter->setFont(normalText);
-//    painter->drawText(0.0f, 0.0f, 150.0f, 20.0f, Qt::AlignLeading, QString("%1").arg(frameCounter));
     frameCounter++;
 }
 
@@ -255,39 +245,24 @@ void Painter::updateIndicators() {
     }
 
     // Left blinker
-    if (vehicle->getLeftBlinker()) {
-        if (frameCounter < 80) {
-            indicators.left = true;
-        } else {
-            indicators.left = QTime::currentTime().msec() < 500;
-        }
-    } else {
+    if (vehicle->getLeftBlinker())
+        indicators.left = true;
+    else
         indicators.left = false;
-    }
 
     // Right blinker
-    if (vehicle->getRightBlinker()) {
-        if (frameCounter < 80) {
-            indicators.right = true;
-        } else {
-            indicators.right = QTime::currentTime().msec() < 500;
-        }
-    } else {
+    if (vehicle->getRightBlinker())
+        indicators.right = true;
+    else
         indicators.right = false;
-    }
 
-    indicators.lowBeam = vehicle->getLowBeam();
-    indicators.highBeam = (vehicle->getHighBeam() && vehicle->getLowBeam());
+    indicators.lowBeam = vehicle->getLowBeam() || vehicle->getHighBeam();
+    indicators.highBeam = vehicle->getHighBeam();
     indicators.mil = vehicle->getMil();
     indicators.oil = vehicle->getOilPressure() < 10.0f;
-    indicators.battery = vehicle->getVoltage() < 12.0f || vehicle->getVoltage() > 15.0f;
+    indicators.battery = vehicle->getVoltage() < 11.5f || vehicle->getVoltage() > 15.0f;
     indicators.fuel = vehicle->getFuel() <= 0.25f;
     indicators.coolant = vehicle->getCoolant() > 257.0f;
     indicators.shiftLight = vehicle->getRpm() > 6500.0f;
-}
-
-void Painter::processCapturedImage(int requestId, const QImage& img)
-{
-    Q_UNUSED(requestId);
-    cameraImage = img;
+    indicators.serialConnected = vehicle->getSerialConnected();
 }

@@ -9,6 +9,8 @@
 #include "eepromHelper.h"
 #include "serialReader.h"
 
+#define DEBUG     true
+
 #define LO_FREQ   15000000  // 15000000
 #define MD_FREQ   250000    // 250000
 #define HI_FREQ   100000    // 100000
@@ -20,11 +22,6 @@ elapsedMicros highFrequency;
 
 bool startedShutdown = false;
 
-Smoothed<int> highBeam;
-Smoothed<int> lowBeam;
-Smoothed<int> reverseLight;
-Smoothed<int> rightIndicator;
-Smoothed<int> leftIndicator;
 Smoothed<float> battery;
 Smoothed<float> fuelLevel;
 
@@ -45,11 +42,6 @@ void setup() {
   lowFrequency = LO_FREQ;
 
   battery.begin(SMOOTHED_AVERAGE, 10);
-  highBeam.begin(SMOOTHED_AVERAGE, 10);
-  lowBeam.begin(SMOOTHED_AVERAGE, 10);
-  reverseLight.begin(SMOOTHED_AVERAGE, 10);
-  rightIndicator.begin(SMOOTHED_AVERAGE, 10);
-  leftIndicator.begin(SMOOTHED_AVERAGE, 10);
   fuelLevel.begin(SMOOTHED_AVERAGE, 10);
 
   pinMode(VSS, INPUT_PULLUP);
@@ -60,6 +52,7 @@ void setup() {
   pinMode(RIGHT, INPUT);
   pinMode(LEFT, INPUT);
   pinMode(REV, INPUT);
+  pinMode(MIL, INPUT);
 
   ptSensor.init();
 }
@@ -94,17 +87,43 @@ void loop() {
     else if(strstr(serialMessage, "wo:") != NULL) {
       char *values = serialMessage + 3;
 
+      // Write trip odometer
       char *token = strtok(values, ",");
-      writeMileage(TRIP, atof(token));
+      tripOdometer = atof(token);
+      writeMileage(TRIP, tripOdometer);
 
+      // Write mileage odometer
       token = strtok(NULL, ",");
-      writeMileage(REGULAR, atof(token));
+      odometer = atof(token);
+      writeMileage(REGULAR, odometer);
+
+      char output[512] = {0};
+      sprintf(
+        output, 
+        "log:SERIAL_LOG-Wrote mileage (trip %f, odo %f) to EEPROM.",
+        tripOdometer,
+        odometer
+      );
+      Serial.println(output);
+
+      sendOdometerValues();
     }
 
      // Pi writing pulses per mile
     else if(strstr(serialMessage, "wppm:") != NULL) {
       char *value = serialMessage + 5;
-      writePPM(atoi(value));
+      int ppm = atoi(value);
+      writePPM(ppm);
+
+      char output[512] = {0};
+      sprintf(
+        output, 
+        "log:SERIAL_LOG-Wrote PPM (%d) to EEPROM.",
+        ppm
+      );
+      Serial.println(output);
+
+      sendPPM();
     }
   }
 
@@ -125,7 +144,9 @@ void loop() {
     // Send numPulses & pulseSep
     char output[25] = {0};
     sprintf(output, "pulses:%d,%d", numPulses, pulseSep);
+#ifndef DEBUG
     Serial.println(output);
+#endif
   }
 
   // Medium frequency updates
@@ -135,16 +156,19 @@ void loop() {
     char output[512] = {0};
     sprintf(
       output, 
-      "batt:%f\nfuel:%f\nhi:%d\nleft:%d\nlo:%d\nrev:%d\nright:%d\n",
+      "batt:%f\nfuel:%f\nhi:%d\nleft:%d\nlo:%d\nrev:%d\nright:%d\nmil:%d",
       battery.get(),
       fuelLevel.get(),
-      highBeam.get(),
-      leftIndicator.get(),
-      lowBeam.get(),
-      reverseLight.get(),
-      rightIndicator.get()
+      readHighBeam(),
+      readLeftIndicator(),
+      readLowBeam(),
+      readReverse(),
+      readRightIndicator(),
+      readMIL()
     );
-    Serial.print(output);
+//#ifndef DEBUG
+    Serial.println(output);
+//#endif
   }
 
   // Low frequency updates
@@ -159,22 +183,13 @@ void loop() {
       "temp:%f\n",
       (temperature * 1.8) + 32.0 // Convert to degF
     );
-    Serial.print(output);
-  }
-
-  // Only write odometers to EEPROM if battery voltage is good to prevent potential corruption
-  if (analogRead(IGNI) > 500) {
-    writeMileage(REGULAR, odometer);
-    writeMileage(TRIP, tripOdometer); 
+#ifndef DEBUG
+    Serial.println(output);
+#endif
   }
 }
 
 void readAnalog() {
   battery.add(readBattery());
-  highBeam.add(readHighBeam());
-  lowBeam.add(readLowBeam());
-  reverseLight.add(readReverseLight());
-  rightIndicator.add(readRightIndicator());
-  leftIndicator.add(readLeftIndicator());
   fuelLevel.add(readFuelLevel()); 
 }

@@ -4,6 +4,7 @@
 #include <QThread>
 #include <QTcpSocket>
 #include <QDebug>
+#include <QTimer>
 #include "variables.h"
 #include "vehiclevalues.h"
 
@@ -20,11 +21,13 @@ signals:
 public slots:
     void readyRead();
     void disconnected();
+    void sendInputs();
 
 private:
     QTcpSocket *socket;
     qintptr socketDescriptor;
     VehicleValues *vehicle;
+    QTimer *timer;
 };
 
 #endif // COMMSTHREAD_H

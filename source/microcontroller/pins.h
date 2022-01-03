@@ -8,3 +8,4 @@
 #define LOBM    10  // Low beam headlights
 #define FUEL    A9  // Fuel sensor
 #define VSS     12  // Vehicle Speed Sensor
+#define MIL     6   // MIL (ground switched)

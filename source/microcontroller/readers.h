@@ -2,7 +2,9 @@
 
 // Reads battery voltage (0-15)
 float readBattery() {
-  return ((float)analogRead(IGNI) / 1024.0) * 17.45; // 15.25 multiplier determined experimentally
+  float Vin = ((float)analogRead(IGNI) / 1024.0) * 3.3;
+  
+  return ((127.0 * Vin) / 27.0) + 2.6;
 }
 
 int readHighBeam() {
@@ -13,7 +15,7 @@ int readLowBeam() {
   return digitalRead(LOBM);
 }
 
-int readReverseLight() {
+int readReverse() {
   return digitalRead(REV);
 }
 
@@ -23,6 +25,10 @@ int readRightIndicator() {
 
 int readLeftIndicator() {
   return digitalRead(LEFT);
+}
+
+int readMIL() {
+  return digitalRead(MIL);
 }
 
 // Read exponential fuel level

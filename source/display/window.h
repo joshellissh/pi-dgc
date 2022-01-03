@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QGridLayout>
 #include <QKeyEvent>
+#include "hwdialog.h"
 
 class Window : public QWidget
 {
@@ -16,10 +17,12 @@ public:
     Window(VehicleValues &vehicle);
     void keyPressEvent(QKeyEvent *event);
     void mousePressEvent(QMouseEvent *event);
+    void setHWDialog(HWDialog &hwDialog);
 
 private:
     Painter *painter;
     VehicleValues *vehicle;
+    HWDialog *hwDialog;
 };
 
 #endif // WINDOW_H

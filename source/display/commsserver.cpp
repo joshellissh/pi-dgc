@@ -30,7 +30,7 @@ void CommsServer::incomingConnection(qintptr socketDescriptor)
     CommsThread *thread = new CommsThread(socketDescriptor, *vehicle, this);
 
     // Connect signal/slot
-    // Once a thread is not needed, it will be beleted later
+    // Once a thread is not needed, it will be deleted later
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
 
     thread->start();

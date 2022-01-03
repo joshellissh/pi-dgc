@@ -1,7 +1,7 @@
 package sh.ellis.pidgc.utils
 
 fun isWindows(): Boolean {
-    val os = System.getProperty("os.name").toLowerCase()
+    val os = System.getProperty("os.name").lowercase()
 
     return when {
         os.contains("win") -> true

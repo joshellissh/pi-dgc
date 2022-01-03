@@ -1,6 +1,7 @@
 #include "window.h"
 #include <QApplication>
 #include <QSurfaceFormat>
+#include "hwdialog.h"
 #include "commsserver.h"
 
 int main(int argc, char *argv[])
@@ -16,11 +17,20 @@ int main(int argc, char *argv[])
 
     // Create server
     CommsServer server(vehicle);
-    server.startServer();
 
     // Create window
     Window window(vehicle);
+    window.setCursor(Qt::BlankCursor);
     window.show();
+
+    // Create hardware dialog
+    HWDialog hwDialog(vehicle, &window);
+
+    // Store dialog reference in various windows
+    window.setHWDialog(hwDialog);
+
+    // Start server
+    server.startServer();
 
     return app.exec();
 }

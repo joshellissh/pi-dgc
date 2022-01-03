@@ -54,6 +54,9 @@ boot_delay=0
   - `sudo /sbin/ip link set can0 up type can bitrate 500000`
 - Add user `pi` to dialout group:
   - `sudo adduser pi dialout`
+- Install font:
+  - Copy `files/bladi-two-4f-italic.ttf` to `/home/pi/.fonts`
+  - Run `fc-cache -v -f`
 - Disable unused services once everything is done. This decreases boot time substantially:
   - sudo systemctl disable ssh
   - sudo systemctl disable hciuart 

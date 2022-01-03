@@ -29,4 +29,14 @@ void Window::mousePressEvent(QMouseEvent *event) {
         qDebug() << "Trip reset pressed.";
         vehicle->resetTrip = true;
     }
+
+    // See if microcontroller button was pressed
+    if (sqrt(pow(1240.0 - event->x(), 2) + pow(30.0 - event->y(), 2) * 1.0) < 60.0f) {
+        qDebug() << "Microcontroller button pressed.";
+        hwDialog->show();
+    }
+}
+
+void Window::setHWDialog(HWDialog &hwDialog) {
+    this->hwDialog = &hwDialog;
 }

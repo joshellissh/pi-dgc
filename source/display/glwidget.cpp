@@ -18,6 +18,6 @@ void GLWidget::paintEvent(QPaintEvent *event)
     QPainter localPainter;
     localPainter.begin(this);
     localPainter.setRenderHint(QPainter::Antialiasing);
-    painter->paint(&localPainter, event, elapsed);
+    painter->paint(&localPainter, event);
     localPainter.end();
 }

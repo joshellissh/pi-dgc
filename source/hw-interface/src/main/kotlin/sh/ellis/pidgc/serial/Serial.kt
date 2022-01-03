@@ -3,10 +3,8 @@ package sh.ellis.pidgc.serial
 import com.fazecast.jSerialComm.SerialPort
 import com.fazecast.jSerialComm.SerialPortEvent
 import com.fazecast.jSerialComm.SerialPortMessageListener
-import sh.ellis.pidgc.config.Config
 import sh.ellis.pidgc.state.State
 import sh.ellis.pidgc.utils.equalsToTenths
-import sh.ellis.pidgc.utils.isWindows
 import sh.ellis.pidgc.utils.toBoolean
 import java.time.Instant
 
@@ -18,6 +16,8 @@ object Serial : Runnable {
 
     private var comPort: SerialPort? = null
     private var lastPacket = Instant.MIN
+    private var odoReceived: Int = 0
+    private var ppmReceived: Int = 0
 
     private class MessageListener : SerialPortMessageListener {
         override fun getListeningEvents(): Int {
@@ -52,26 +52,33 @@ object Serial : Runnable {
             if (Instant.now().minusMillis(2500) > lastPacket) {
                 State.addLogMessage("Serial port seems to be stalled or closed. Reopening.")
 
+                State.serialConnected = false
+
                 // Attempt to close port first, just in case
                 try {
                     comPort?.removeDataListener()
                     comPort?.closePort()
                 } catch (e: Exception) {}
 
-                val portString = if (isWindows()) "COM6" else "/dev/ttyACM0"
-                comPort = SerialPort.getCommPort(portString)
-                comPort?.openPort()
-                comPort?.setRTS()
-                Thread.sleep(1000)
-                comPort?.clearRTS()
-                comPort?.baudRate = 115200
-                comPort?.addDataListener(MessageListener())
+                try {
+                    comPort = SerialPort.getCommPort("/dev/ttyACM0")
+                    comPort?.openPort()
+                    comPort?.setRTS()
+                    Thread.sleep(1000)
+                    comPort?.clearRTS()
+                    comPort?.baudRate = 115200
+                    comPort?.addDataListener(MessageListener())
 
-                // Request odometer values & VSS PPM
-                sendToSerial("so")
-                sendToSerial("sppm")
+                    println("Serial port successfully opened.")
 
-                State.addLogMessage("Serial port successfully opened.")
+                    // Request odometer values & VSS PPM
+                    println("Requested odometer values.")
+                    sendToSerial("so")
+                    println("Requested PPM.")
+                    sendToSerial("sppm")
+                } catch (e: Exception) {
+                    println("Unable to find serial port.")
+                }
             }
 
             Thread.sleep(2000)
@@ -79,6 +86,8 @@ object Serial : Runnable {
     }
 
     private fun processPacket(packet: String) {
+        State.serialConnected = true
+
         val parts = packet.split(":").toMutableList()
 
         when(parts[0]) {
@@ -88,6 +97,7 @@ object Serial : Runnable {
             "left" -> State.left = parts[1].toInt().toBoolean()
             "lo" -> State.lowBeam = parts[1].toInt().toBoolean()
             "log" -> State.addLogMessage(parts[1])
+            "mil" -> State.mil = parts[1].toInt().toBoolean()
             "odo" -> setOdometerState(parts[1])
             "ppm" -> setVssPpm(parts[1].toInt())
             "pulses" -> handlePulses(parts[1])
@@ -97,14 +107,20 @@ object Serial : Runnable {
     }
 
     private fun setVssPpm(ppm: Int) {
+        println("Received PPM of $ppm from Serial.")
+
         if (ppm == -1) {
             println("Could not read PPM from EEPROM. Defaulting to 8000.")
             State.vssPulsesPerMile = 8000
             return
         }
 
-        println("Initializing vssPulsesPerMile to $ppm")
-        State.vssPulsesPerMile = ppm
+        if (ppm != State.vssPulsesPerMile) {
+            println("Setting vssPulsesPerMile to $ppm")
+            State.vssPulsesPerMile = ppm
+        }
+
+        ppmReceived = -1
     }
 
     private fun setOdometerState(values: String) {
@@ -112,6 +128,8 @@ object Serial : Runnable {
 
         if (parts.size != 2)
             println("Odometer value from uC is not two parts")
+
+        odoReceived = -1
 
         State.tripOdometer = parts[0].toDouble()
         State.lastSavedTripOdometer = parts[0].toDouble()
@@ -131,7 +149,7 @@ object Serial : Runnable {
         comPort?.writeBytes(sendString.toByteArray(), sendString.length.toLong())
     }
 
-    private fun writeOdometers(tripOdometer: Double, odometer: Double) {
+    fun writeOdometers(tripOdometer: Double, odometer: Double) {
         // Only save to EEPROM if either of our tenths values have changed
         if (State.lastSavedOdometer.equalsToTenths(odometer) &&
             State.lastSavedTripOdometer.equalsToTenths(tripOdometer)) {
@@ -164,7 +182,9 @@ object Serial : Runnable {
         State.odometer += distance
         State.tripOdometer += distance
 
-        writeOdometers(State.tripOdometer, State.odometer)
+        // Don't write odometers if they report as 0
+        if (State.tripOdometer > 0.0 && State.odometer > 0.0)
+            writeOdometers(State.tripOdometer, State.odometer)
 
         if (pulseSeparationMicros != NO_PULSE && pulseSeparationMicros > 0L) {
             // Calculate MPH
@@ -173,6 +193,22 @@ object Serial : Runnable {
             State.mph.add(mph)
         } else {
             State.mph.add(0.0)
+        }
+
+        if (ppmReceived != -1)
+            ppmReceived++
+
+        if (odoReceived != -1)
+            odoReceived++
+
+        if (ppmReceived >= 10) {
+            sendToSerial("sppm")
+            ppmReceived = 0
+        }
+
+        if (odoReceived >= 10) {
+            sendToSerial("so")
+            odoReceived = 0
         }
     }
 }

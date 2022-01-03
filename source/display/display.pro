@@ -31,7 +31,8 @@ SOURCES += \
     vehiclevalues.cpp \
     indicators.cpp \
     commsserver.cpp \
-    commsthread.cpp
+    commsthread.cpp \
+    hwdialog.cpp
 
 HEADERS += \
     glwidget.h \
@@ -44,4 +45,8 @@ HEADERS += \
     vehiclevalues.h \
     indicators.h \
     commsserver.h \
-    commsthread.h
+    commsthread.h \
+    hwdialog.h
+
+FORMS += \
+    hwdialog.ui

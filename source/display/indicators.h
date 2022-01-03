@@ -19,6 +19,7 @@ public:
     bool boostLaggingMax;
     float boostLaggingMaxOpacity;
     bool shiftLight;
+    bool serialConnected;
 };
 
 #endif // INDICATORS_H

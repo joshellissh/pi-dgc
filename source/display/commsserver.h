@@ -19,7 +19,6 @@ protected:
 
 private:
     VehicleValues *vehicle;
-
 };
 
 #endif // COMMSSERVER_H

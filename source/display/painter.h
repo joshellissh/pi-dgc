@@ -11,8 +11,6 @@
 #include <QCoreApplication>
 #include <QImage>
 #include <QTime>
-#include <QCamera>
-#include <QCameraImageCapture>
 #include "images.h"
 #include "drawing.h"
 #include "variables.h"
@@ -27,7 +25,7 @@ public:
     Painter(VehicleValues &vehicle);
 
 public:
-    void paint(QPainter *painter, QPaintEvent *event, int elapsed);
+    void paint(QPainter *painter, QPaintEvent *event);
     void initLoop();
     void updateIndicators();
 
@@ -43,16 +41,9 @@ private:
     QPen gaugeTextPen;
     QPen lightTextPen;
 
-    QCamera *camera;
-    QCameraImageCapture *imageCapture;
-    QImage cameraImage;
-
     unsigned long long frameCounter;
     Indicators indicators;
     VehicleValues *vehicle;
-
-private slots:
-    void processCapturedImage(int requestId, const QImage &img);
 };
 
 #endif // PAINTER_H
