@@ -156,7 +156,7 @@ void loop() {
     char output[512] = {0};
     sprintf(
       output, 
-      "batt:%f\nfuel:%f\nhi:%d\nleft:%d\nlo:%d\nrev:%d\nright:%d\nmil:%d",
+      "batt:%f\nfuel:%f\nhi:%d\nleft:%d\nlo:%d\nrev:%d\nright:%d\nmil:%d\nglite:%d",
       battery.get(),
       fuelLevel.get(),
       readHighBeam(),
@@ -164,7 +164,8 @@ void loop() {
       readLowBeam(),
       readReverse(),
       readRightIndicator(),
-      readMIL()
+      readMIL(),
+      readGaugeLights()
     );
 //#ifndef DEBUG
     Serial.println(output);

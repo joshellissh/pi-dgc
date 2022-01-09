@@ -31,6 +31,10 @@ int readMIL() {
   return digitalRead(MIL);
 }
 
+int readGaugeLights() {
+  return digitalRead(GAUGE_LIGHTS);
+}
+
 // Read exponential fuel level
 float readFuelLevel() {
   float fuelRaw = (float)analogRead(FUEL);
