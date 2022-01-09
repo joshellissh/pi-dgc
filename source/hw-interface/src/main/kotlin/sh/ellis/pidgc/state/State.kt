@@ -22,6 +22,9 @@ object State {
     var fuel: Double = 0.0
 
     @set:Synchronized @get:Synchronized
+    var gaugeLights: Boolean = false
+
+    @set:Synchronized @get:Synchronized
     var highBeam: Boolean = false
 
     @set:Synchronized @get:Synchronized

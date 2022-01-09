@@ -93,6 +93,7 @@ object Serial : Runnable {
         when(parts[0]) {
             "batt" -> State.battery = parts[1].toDouble()
             "fuel" -> State.fuel = parts[1].toDouble()
+            "glite" -> State.gaugeLights = parts[1].toBoolean()
             "hi" -> State.highBeam = parts[1].toInt().toBoolean()
             "left" -> State.left = parts[1].toInt().toBoolean()
             "lo" -> State.lowBeam = parts[1].toInt().toBoolean()
