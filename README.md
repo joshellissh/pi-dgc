@@ -30,7 +30,7 @@ Setup steps on Buster Lite:
   - `sudo apt-get install libts-dev libxkbcommon-x11-0 libwebpdemux2 libgstreamer-plugins-base1.0-0 gstreamer1.0-gl gstreamer1.0-plugins-bad`
 - Add `pi` user to render group. This is required for good performance.
   - `sudo gpasswd -a pi render`
-- Copy the `files/qt5.15.tar.gz` archive to your Raspberry Pi 4, and then decompress it into `/usr/local/qt5.15`
+- Copy the `files/qt5.15.tar.gz` archive to your Raspberry Pi 4, and then decompress it into `/usr/local`, so you end up with a `/usr/local/qt5.15` folder with files under it.
 - Make PiDGC folder and copy over all files:
   - `mkdir ~/pidgc`
   - Copy `files/display` into ~/pidgc folder
@@ -45,8 +45,8 @@ boot_delay=0
 ~~~
 - Append `quiet fastboot` to `/boot/cmdline.txt`
 - Append contents of `files/network_interfaces` to file `/etc/network/interfaces`
-- Copy contents of `linux/pidgc-display.service` to `/etc/systemd/system/pidgc-display.service`
-- Copy contents of `linux/pidgc-hw-interface.service` to `/etc/systemd/system/pidgc-hw-interface.service`
+- Copy contents of `files/pidgc-display.service` to `/etc/systemd/system/pidgc-display.service`
+- Copy contents of `files/pidgc-hw-interface.service` to `/etc/systemd/system/pidgc-hw-interface.service`
 - Enable both services
   - `sudo systemctl enable pidgc-display.service`
   - `sudo systemctl enable pidgc-hw-interface.service`
