@@ -65,8 +65,8 @@ boot_delay=0
   - sudo systemctl disable systemd-timesyncd
   - sudo systemctl disable wpa_supplicant
   - sudo systemctl disable rpi-eeprom-update
-  - sudo systemctl disable raspi-config
   - sudo systemctl disable networking
   - sudo systemctl disable dhcpcd
+- **IMPORTANT**: Make your filesystem read-only. This will prevent corruption due to hard shutdowns when your car powers off: http://comfilewiki.co.kr/en/doku.php?id=comfilepi:read-only_file_system_with_overlay
 
 Now when you reboot the system should start the display and be up and running!

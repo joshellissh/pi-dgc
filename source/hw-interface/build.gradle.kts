@@ -27,7 +27,7 @@ dependencies {
     implementation("tel.schich:javacan:2.3.0")
     implementation("org.ini4j:ini4j:0.5.4")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("com.fazecast:jSerialComm:[2.0.0,3.0.0)")
+    implementation("com.fazecast:jSerialComm:2.7.0")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.+")
     implementation("ch.qos.logback:logback-classic:1.2.5")
 }

@@ -9,7 +9,7 @@
 #include "eepromHelper.h"
 #include "serialReader.h"
 
-#define DEBUG     true
+//#define DEBUG     true
 
 #define LO_FREQ   15000000  // 15000000
 #define MD_FREQ   250000    // 250000
@@ -53,6 +53,7 @@ void setup() {
   pinMode(LEFT, INPUT);
   pinMode(REV, INPUT);
   pinMode(MIL, INPUT);
+  pinMode(GAUGE_LIGHTS, INPUT);
 
   ptSensor.init();
 }
@@ -167,9 +168,9 @@ void loop() {
       readMIL(),
       readGaugeLights()
     );
-//#ifndef DEBUG
+#ifndef DEBUG
     Serial.println(output);
-//#endif
+#endif
   }
 
   // Low frequency updates

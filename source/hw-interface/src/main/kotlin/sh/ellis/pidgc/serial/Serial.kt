@@ -61,11 +61,20 @@ object Serial : Runnable {
                 } catch (e: Exception) {}
 
                 try {
-                    comPort = SerialPort.getCommPort("/dev/ttyACM0")
-                    comPort?.openPort()
-                    comPort?.setRTS()
-                    Thread.sleep(1000)
-                    comPort?.clearRTS()
+                    val comPorts = SerialPort.getCommPorts()
+                    val comPortNames = comPorts.map { it.systemPortName }.toList()
+
+                    println("Found COM ports: $comPortNames")
+                    println("Opening port ${comPortNames[0]}...")
+
+                    comPort = comPorts[0]
+
+                    if (comPort?.openPort() == false) {
+                        println("Failed to open COM port. Retrying in 2 seconds...")
+                        Thread.sleep(2000)
+                        continue
+                    }
+
                     comPort?.baudRate = 115200
                     comPort?.addDataListener(MessageListener())
 
@@ -93,7 +102,7 @@ object Serial : Runnable {
         when(parts[0]) {
             "batt" -> State.battery = parts[1].toDouble()
             "fuel" -> State.fuel = parts[1].toDouble()
-            "glite" -> State.gaugeLights = parts[1].toBoolean()
+            "glite" -> State.gaugeLights = parts[1].toInt().toBoolean()
             "hi" -> State.highBeam = parts[1].toInt().toBoolean()
             "left" -> State.left = parts[1].toInt().toBoolean()
             "lo" -> State.lowBeam = parts[1].toInt().toBoolean()
