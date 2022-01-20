@@ -4,7 +4,7 @@
 float readBattery() {
   float Vin = ((float)analogRead(IGNI) / 1024.0) * 3.3;
   
-  return ((127.0 * Vin) / 27.0) + 2.6;
+  return (127.0 * Vin) / 27.0;
 }
 
 int readHighBeam() {
