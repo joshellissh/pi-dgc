@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/sounds">
+        <file>chime.wav</file>
+        <file>blinker.wav</file>
+    </qresource>
+</RCC>

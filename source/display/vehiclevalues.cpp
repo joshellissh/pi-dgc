@@ -10,6 +10,7 @@ void VehicleValues::reset() {
     mph = 0.0f;
     coolant = 170.0f;
     fuel = 0.0f;
+    gaugeLights = false;
     boost = 0.0f;
     voltage = 0.0f;
     odometer = 0.0f;
@@ -43,6 +44,9 @@ void VehicleValues::deserialize(const QJsonObject &json) {
 
     if (json.contains("fuel") && json["fuel"].isDouble())
        fuel = json["fuel"].toDouble();
+
+    if (json.contains("gaugeLights") && json["gaugeLights"].isBool())
+       gaugeLights = json["gaugeLights"].toBool();
 
     if (json.contains("boost") && json["boost"].isDouble())
        boost = json["boost"].toDouble();
@@ -92,6 +96,7 @@ QString VehicleValues::serialize() {
     jobject["mph"] = mph;
     jobject["coolant"] = coolant;
     jobject["fuel"] = fuel;
+    jobject["gaugeLights"] = gaugeLights;
     jobject["boost"] = boost;
     jobject["voltage"] = voltage;
     jobject["odometer"] = odometer;

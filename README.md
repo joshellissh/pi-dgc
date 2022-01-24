@@ -28,6 +28,7 @@ Setup steps on Buster Lite:
 - Install dependencies needed for PiDGC:
   - `sudo apt-get install libgles2 libpulse-dev libdouble-conversion-dev libegl1-mesa libmtdev-dev libinput-tools default-jdk`
   - `sudo apt-get install libts-dev libxkbcommon-x11-0 libwebpdemux2 libgstreamer-plugins-base1.0-0 gstreamer1.0-gl gstreamer1.0-plugins-bad`
+  - `sudo apt-get install gstreamer1.0-plugins-good pulseaudio`
 - Add `pi` user to render group. This is required for good performance.
   - `sudo gpasswd -a pi render`
 - Copy the `files/qt5.15.tar.gz` archive to your Raspberry Pi 4, and then decompress it into `/usr/local`, so you end up with a `/usr/local/qt5.15` folder with files under it.

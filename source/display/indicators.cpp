@@ -15,4 +15,5 @@ Indicators::Indicators()
     boostLaggingMaxOpacity = 0.0f;
     shiftLight = false;
     serialConnected = false;
+    gaugeLights = false;
 }

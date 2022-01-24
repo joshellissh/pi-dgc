@@ -10,6 +10,7 @@
 #include <QPainterPath>
 #include <QCoreApplication>
 #include <QImage>
+#include <QMediaPlayer>
 #include <QTime>
 #include "images.h"
 #include "drawing.h"
@@ -28,10 +29,15 @@ public:
     void paint(QPainter *painter, QPaintEvent *event);
     void initLoop();
     void updateIndicators();
+    void playChime();
+    void playBlinker();
 
 private:
     QBrush backgroundBrush;
     QBrush shiftLightBrush;
+
+    QMediaPlayer *chimePlayer;
+    QMediaPlayer *blinkerPlayer;
 
     ImageMap *images;
     QFont largeGauge;
@@ -44,6 +50,7 @@ private:
     unsigned long long frameCounter;
     Indicators indicators;
     VehicleValues *vehicle;
+    double brightness = 1.0;
 };
 
 #endif // PAINTER_H

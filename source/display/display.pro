@@ -50,3 +50,6 @@ HEADERS += \
 
 FORMS += \
     hwdialog.ui
+
+RESOURCES += \
+    sound.qrc

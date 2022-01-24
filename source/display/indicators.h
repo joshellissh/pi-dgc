@@ -20,6 +20,7 @@ public:
     float boostLaggingMaxOpacity;
     bool shiftLight;
     bool serialConnected;
+    bool gaugeLights;
 };
 
 #endif // INDICATORS_H

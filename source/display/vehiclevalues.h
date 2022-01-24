@@ -35,6 +35,8 @@ public:
     float getCoolant() { QMutexLocker locker(&mutex); return this->coolant; }
     void setFuel(float fuel) { QMutexLocker locker(&mutex); this->fuel = fuel; }
     float getFuel() { QMutexLocker locker(&mutex); return this->fuel; }
+    void setGaugeLights(bool gaugeLights) { QMutexLocker locker(&mutex); this->gaugeLights = gaugeLights; }
+    float getGaugeLights() { QMutexLocker locker(&mutex); return this->gaugeLights; }
     void setHighBeam(bool highBeam) { QMutexLocker locker(&mutex); this->highBeam = highBeam; }
     bool getHighBeam() { QMutexLocker locker(&mutex); return this->highBeam; }
     void setLeftBlinker(bool leftBlinker) { QMutexLocker locker(&mutex); this->leftBlinker = leftBlinker; }
@@ -72,6 +74,7 @@ private:
     float boostLaggingMax;
     float coolant;
     float fuel;
+    bool gaugeLights;
     bool highBeam;
     bool leftBlinker;
     bool lowBeam;

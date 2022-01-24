@@ -131,95 +131,31 @@
     </property>
    </widget>
   </widget>
-  <widget class="QGroupBox" name="groupBox_2">
+  <widget class="QCheckBox" name="chimeBox">
    <property name="geometry">
     <rect>
      <x>560</x>
      <y>110</y>
-     <width>411</width>
-     <height>131</height>
+     <width>191</width>
+     <height>23</height>
     </rect>
    </property>
-   <property name="title">
-    <string>Time &amp;&amp; Date</string>
+   <property name="text">
+    <string>Enable Chime Sound</string>
    </property>
-   <widget class="QLabel" name="label_8">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>40</y>
-      <width>67</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Current:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_9">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>90</y>
-      <width>41</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>New:</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="currentDateTime">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>30</y>
-      <width>321</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QDateEdit" name="dateEdit">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>80</y>
-      <width>151</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="displayFormat">
-     <string>MM/dd/yyyy</string>
-    </property>
-    <property name="calendarPopup">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QTimeEdit" name="timeEdit">
-    <property name="geometry">
-     <rect>
-      <x>240</x>
-      <y>80</y>
-      <width>161</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="accelerated">
-     <bool>true</bool>
-    </property>
-    <property name="showGroupSeparator" stdset="0">
-     <bool>false</bool>
-    </property>
-    <property name="displayFormat">
-     <string>hh:mm:ss AP</string>
-    </property>
-    <property name="calendarPopup">
-     <bool>true</bool>
-    </property>
-   </widget>
+  </widget>
+  <widget class="QCheckBox" name="blinkerBox">
+   <property name="geometry">
+    <rect>
+     <x>560</x>
+     <y>140</y>
+     <width>171</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Enable Blinker Sound</string>
+   </property>
   </widget>
  </widget>
  <resources/>

@@ -1,12 +1,16 @@
 #include "window.h"
 #include <QApplication>
 #include <QSurfaceFormat>
+#include <QThread>
+#include <QProcess>
 #include "hwdialog.h"
 #include "commsserver.h"
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+
+    QProcess::execute("pulseaudio -D");
 
     // Turn on anti-aliasing
     QSurfaceFormat fmt;

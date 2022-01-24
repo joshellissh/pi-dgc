@@ -2,6 +2,7 @@
 #include "converters.h"
 #include <QList>
 #include <QActionGroup>
+#include <QAudioDeviceInfo>
 
 Painter::Painter(VehicleValues &vehicle)
 {
@@ -24,6 +25,15 @@ Painter::Painter(VehicleValues &vehicle)
 
     // Load all gauge cluster images
     images = loadImages(QString("%1/images/").arg(QCoreApplication::applicationDirPath()));
+
+    // Load sounds
+    chimePlayer = new QMediaPlayer();
+    chimePlayer->setMedia(QUrl("qrc:/sounds/chime.wav"));
+    chimePlayer->setVolume(100);
+
+    blinkerPlayer = new QMediaPlayer();
+    blinkerPlayer->setMedia(QUrl("qrc:/sounds/blinker.wav"));
+    blinkerPlayer->setVolume(100);
 }
 
 void Painter::paint(QPainter *painter, QPaintEvent *event)
@@ -122,21 +132,25 @@ void Painter::paint(QPainter *painter, QPaintEvent *event)
     if (indicators.mil)
         drawCenteredAt(painter, images->at("mil.png"), 640.0, 115.0);
 
+    // Gauge lights/parking lights indicator
+    if (indicators.gaugeLights)
+        drawCenteredAt(painter, images->at("parking-lights.png"), 715.0, 115.0);
+
     // Oil indicator
     if (indicators.oil)
-        drawCenteredAt(painter, images->at("oil.png"), 715.0, 115.0);
+        drawCenteredAt(painter, images->at("oil.png"), 603.0, 362.0);
 
     // Battery indicator
     if (indicators.battery)
-        drawCenteredAt(painter, images->at("battery.png"), 640.0, 362.0);
+        drawCenteredAt(painter, images->at("battery.png"), 678.0, 362.0);
 
     // Low fuel indicator
     if (indicators.fuel)
-        drawCenteredAt(painter, images->at("fuel.png"), 744.0, 362.0);
+        drawCenteredAt(painter, images->at("fuel.png"), 736.0, 362.0);
 
     // Coolant temp indicator
     if (indicators.coolant)
-        drawCenteredAt(painter, images->at("coolant.png"), 537.0, 362.0);
+        drawCenteredAt(painter, images->at("coolant.png"), 536.0, 362.0);
 
     // Reset trip icon
     painter->setOpacity(0.8);
@@ -178,10 +192,12 @@ void Painter::paint(QPainter *painter, QPaintEvent *event)
     odometerText.sprintf("%.1f", vehicle->getOdometer());
     painter->drawText(575.0f, 415.0f, 300.0f, 20.0f, Qt::AlignTrailing, odometerText);
 
-    // Clock
-    painter->setFont(largeText);
-    painter->drawText(565.0f, 45.0f, 150.0f, 30.0f, Qt::AlignCenter | Qt::AlignTop, QTime::currentTime().toString("h:mm a"));
-    painter->setOpacity(1.0);
+    // Dimmer for when lights are on (night time)
+    if (vehicle->getGaugeLights()) {
+        painter->setOpacity(0.5f);
+        painter->fillRect(event->rect(), backgroundBrush);
+        painter->setOpacity(1);
+    }
 
     // Frame counter
     frameCounter++;
@@ -217,6 +233,9 @@ void Painter::initLoop() {
 void Painter::updateIndicators() {
     // Fuel indicator
     if (vehicle->getFuel() <= 0.25) {
+        // Chime to alert driver
+        if (indicators.fuel == false) playChime();
+
         indicators.fuel = true;
     } else {
         indicators.fuel = false;
@@ -244,17 +263,37 @@ void Painter::updateIndicators() {
         }
     }
 
+    // Parking lights / gauge lights
+    if (vehicle->getGaugeLights())
+        indicators.gaugeLights = true;
+    else
+        indicators.gaugeLights = false;
+
     // Left blinker
-    if (vehicle->getLeftBlinker())
+    if (vehicle->getLeftBlinker()) {
+        if (indicators.left == false) playBlinker();
+
         indicators.left = true;
+    }
     else
         indicators.left = false;
 
     // Right blinker
-    if (vehicle->getRightBlinker())
+    if (vehicle->getRightBlinker()) {
+        if (indicators.right == false) playBlinker();
+
         indicators.right = true;
+    }
     else
         indicators.right = false;
+
+    // Chimes for warnings
+    if (vehicle->getRpm() > 500 &&
+            (indicators.mil != vehicle->getMil() ||
+            indicators.oil != vehicle->getOilPressure() ||
+            indicators.battery != (vehicle->getVoltage() < 11.5f || vehicle->getVoltage() > 15.0f) ||
+            indicators.coolant != (vehicle->getCoolant() > 257.0f)))
+        playChime();
 
     indicators.lowBeam = vehicle->getLowBeam() || vehicle->getHighBeam();
     indicators.highBeam = vehicle->getHighBeam();
@@ -265,4 +304,16 @@ void Painter::updateIndicators() {
     indicators.coolant = vehicle->getCoolant() > 257.0f;
     indicators.shiftLight = vehicle->getRpm() > 6500.0f;
     indicators.serialConnected = vehicle->getSerialConnected();
+}
+
+void Painter::playChime() {
+    if (chimePlayer->state() != QMediaPlayer::PlayingState) {
+        chimePlayer->play();
+    }
+}
+
+void Painter::playBlinker() {
+    if (blinkerPlayer->state() != QMediaPlayer::PlayingState) {
+        blinkerPlayer->play();
+    }
 }
