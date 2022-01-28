@@ -35,7 +35,6 @@ Setup steps on Buster Lite:
 - Make PiDGC folder and copy over all files:
   - `mkdir ~/pidgc`
   - Copy `files/display` into ~/pidgc folder
-  - Copy `files/config.ini` into ~/pidgc folder
   - Copy `files/images` folder and all files it contains into ~/pidgc folder
   - Copy `files/hw-interface.jar` into ~/pidgc folder
 - Edit `/boot/config.txt`. Append:
@@ -68,6 +67,6 @@ boot_delay=0
   - sudo systemctl disable rpi-eeprom-update
   - sudo systemctl disable networking
   - sudo systemctl disable dhcpcd
-- **IMPORTANT**: Make your filesystem read-only. This will prevent corruption due to hard shutdowns when your car powers off: http://comfilewiki.co.kr/en/doku.php?id=comfilepi:read-only_file_system_with_overlay
+- **IMPORTANT**: Make your filesystem read-only after the gauge cluster is working properly and finalized. This will prevent corruption due to hard shutdowns when your car powers off: http://comfilewiki.co.kr/en/doku.php?id=comfilepi:read-only_file_system_with_overlay
 
 Now when you reboot the system should start the display and be up and running!

@@ -17,19 +17,23 @@ application {
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap")
+        name = "ktor-eap"
+    }
 }
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.5.21")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.21")
 
-    implementation("io.ktor:ktor-network:1.6.3")
     implementation("tel.schich:javacan:2.3.0")
     implementation("org.ini4j:ini4j:0.5.4")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("com.fazecast:jSerialComm:2.7.0")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.+")
     implementation("ch.qos.logback:logback-classic:1.2.5")
+    implementation("io.ktor:ktor-network:2.0.0-eap-256")
 }
 
 tasks.withType<KotlinCompile>() {

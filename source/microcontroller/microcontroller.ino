@@ -81,8 +81,8 @@ void loop() {
       sendOdometerValues();
 
     // Pi requesting pulses per mile
-    else if (strcmp(serialMessage, "sppm") == 0)
-      sendPPM();
+    else if (strcmp(serialMessage, "sconfig") == 0)
+      sendConfig();
 
     // Pi writing odometer values
     else if(strstr(serialMessage, "wo:") != NULL) {
@@ -110,21 +110,47 @@ void loop() {
       sendOdometerValues();
     }
 
-     // Pi writing pulses per mile
-    else if(strstr(serialMessage, "wppm:") != NULL) {
-      char *value = serialMessage + 5;
-      int ppm = atoi(value);
-      writePPM(ppm);
+     // Pi writing config
+    else if(strstr(serialMessage, "write_config:") != NULL) {
+      char *values = serialMessage + strlen("write_config:");
+      int ppm = 8000;
+      bool blinkerSound = true;
+      bool chimeSound = true;
+      int screenDimming = 20;
+
+      char* value = strtok(values, ",");
+      int part = 0;
+      while (value != 0) {        
+        if (part == 0)
+          ppm = atoi(value);
+        else if (part == 1)
+          blinkerSound = atoi(value);
+        else if (part == 2)
+          chimeSound = atoi(value);
+        else if (part == 3)
+          screenDimming = atoi(value);
+        
+        value = strtok(0, ",");
+        part++;
+      }
+      
+      writeValue(ppm, PULSES_PER_MILE);
+      writeValue(blinkerSound, BLINKER_SOUND);
+      writeValue(chimeSound, CHIME_SOUND);
+      writeValue(screenDimming, SCREEN_DIMMING);
 
       char output[512] = {0};
       sprintf(
         output, 
-        "log:SERIAL_LOG-Wrote PPM (%d) to EEPROM.",
-        ppm
+        "log:SERIAL_LOG-Wrote config values (%d, %d, %d, %d) to EEPROM.",
+        ppm,
+        blinkerSound,
+        chimeSound,
+        screenDimming
       );
       Serial.println(output);
 
-      sendPPM();
+      sendConfig();
     }
   }
 

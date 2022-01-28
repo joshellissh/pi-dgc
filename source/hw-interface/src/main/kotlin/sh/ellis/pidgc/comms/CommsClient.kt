@@ -6,14 +6,10 @@ import io.ktor.network.sockets.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import sh.ellis.pidgc.serial.Serial
 import sh.ellis.pidgc.state.State
-import java.lang.Thread.sleep
 import java.net.ConnectException
 import java.net.InetSocketAddress
-import kotlin.random.Random
 
 object CommsClient {
 
@@ -51,11 +47,25 @@ object CommsClient {
                                 val parts = it.split(":").toMutableList()
 
                                 when (parts[0]) {
-                                    "WRITE_PPM" -> {
-                                        val newPPM = parts[1].trim('\n').toInt()
+                                    "WRITE_CONFIG" -> {
+                                        val partValues = parts[1].trim('\n').split(",").toMutableList()
+
+                                        val newPPM = partValues[0].toInt()
+                                        val blinkerSound = partValues[1].toBoolean()
+                                        val chimeSound = partValues[2].toBoolean()
+                                        val screenDimming = partValues[3].toInt()
+
                                         println("Setting PPM to $newPPM")
+                                        println("Setting Blinker Sound to $blinkerSound")
+                                        println("Setting Chime Sound to $chimeSound")
+                                        println("Setting Screen Dimming to $screenDimming")
+
+                                        State.blinkerSound = blinkerSound
+                                        State.chimeSound = chimeSound
+                                        State.screenDimming = screenDimming
                                         State.vssPulsesPerMile = newPPM
-                                        Serial.writePpm(newPPM)
+
+                                        Serial.writeConfig(parts[1].trim('\n'))
                                     }
                                     "RESET_TRIP" -> {
                                         State.tripOdometer = 0.0

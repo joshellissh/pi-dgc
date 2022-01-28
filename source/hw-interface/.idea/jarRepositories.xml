@@ -16,5 +16,10 @@
       <option name="name" value="MavenRepo" />
       <option name="url" value="https://repo.maven.apache.org/maven2/" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="ktor-eap" />
+      <option name="name" value="ktor-eap" />
+      <option name="url" value="https://maven.pkg.jetbrains.space/public/p/ktor/eap" />
+    </remote-repository>
   </component>
 </project>

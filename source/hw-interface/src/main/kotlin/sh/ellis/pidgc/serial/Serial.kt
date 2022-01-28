@@ -17,7 +17,7 @@ object Serial : Runnable {
     private var comPort: SerialPort? = null
     private var lastPacket = Instant.MIN
     private var odoReceived: Int = 0
-    private var ppmReceived: Int = 0
+    private var configReceived: Int = 0
 
     private class MessageListener : SerialPortMessageListener {
         override fun getListeningEvents(): Int {
@@ -83,8 +83,8 @@ object Serial : Runnable {
                     // Request odometer values & VSS PPM
                     println("Requested odometer values.")
                     sendToSerial("so")
-                    println("Requested PPM.")
-                    sendToSerial("sppm")
+                    println("Requested config.")
+                    sendToSerial("sconfig")
                 } catch (e: Exception) {
                     println("Unable to find serial port.")
                 }
@@ -109,28 +109,49 @@ object Serial : Runnable {
             "log" -> State.addLogMessage(parts[1])
             "mil" -> State.mil = parts[1].toInt().toBoolean()
             "odo" -> setOdometerState(parts[1])
-            "ppm" -> setVssPpm(parts[1].toInt())
+            "config" -> setConfig(parts[1].split(',').toMutableList())
             "pulses" -> handlePulses(parts[1])
             "rev" -> State.reverse = parts[1].toInt().toBoolean()
             "right" -> State.right = parts[1].toInt().toBoolean()
         }
     }
 
-    private fun setVssPpm(ppm: Int) {
-        println("Received PPM of $ppm from Serial.")
+    private fun setConfig(values: List<String>) {
+        println("Received config values $values from Serial.")
+
+        if (values.size != 4) {
+            println("Invalid config size of ${values.size}")
+            return
+        }
+
+        val ppm = values[0].toInt()
+        val blinkerSound = values[1].toInt().toBoolean()
+        val chimeSound = values[2].toInt().toBoolean()
+        val screenDimming = values[3].toInt()
 
         if (ppm == -1) {
             println("Could not read PPM from EEPROM. Defaulting to 8000.")
             State.vssPulsesPerMile = 8000
-            return
-        }
-
-        if (ppm != State.vssPulsesPerMile) {
+        } else if (ppm != State.vssPulsesPerMile) {
             println("Setting vssPulsesPerMile to $ppm")
             State.vssPulsesPerMile = ppm
         }
 
-        ppmReceived = -1
+        println("Setting blinkerSound to $blinkerSound")
+        State.blinkerSound = blinkerSound
+
+        println("Setting chimeSound to $chimeSound")
+        State.chimeSound = chimeSound
+
+        if (screenDimming < 0 || screenDimming > 100) {
+            println("Invalid value for screenDimming, defaulting to 20.")
+            State.screenDimming = 20
+        } else {
+            println("Setting screenDimming to $screenDimming")
+            State.screenDimming = screenDimming
+        }
+
+        configReceived = -1
     }
 
     private fun setOdometerState(values: String) {
@@ -173,8 +194,8 @@ object Serial : Runnable {
         State.lastSavedTripOdometer = tripOdometer
     }
 
-    fun writePpm(ppm: Int) {
-        sendToSerial("wppm:$ppm")
+    fun writeConfig(configString: String) {
+        sendToSerial("write_config:$configString")
     }
 
     private fun handlePulses(value: String) {
@@ -205,15 +226,15 @@ object Serial : Runnable {
             State.mph.add(0.0)
         }
 
-        if (ppmReceived != -1)
-            ppmReceived++
+        if (configReceived != -1)
+            configReceived++
 
         if (odoReceived != -1)
             odoReceived++
 
-        if (ppmReceived >= 10) {
+        if (configReceived >= 10) {
             sendToSerial("sppm")
-            ppmReceived = 0
+            configReceived = 0
         }
 
         if (odoReceived >= 10) {

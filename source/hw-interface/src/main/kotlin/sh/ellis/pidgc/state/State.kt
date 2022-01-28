@@ -1,7 +1,6 @@
 package sh.ellis.pidgc.state
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import sh.ellis.pidgc.config.Config
 import sh.ellis.pidgc.model.Mph
 
 object State {
@@ -13,7 +12,13 @@ object State {
     var barometricPressure: Double = 0.0
 
     @set:Synchronized @get:Synchronized
+    var blinkerSound: Boolean = true
+
+    @set:Synchronized @get:Synchronized
     var boost: Double = 0.0
+
+    @set:Synchronized @get:Synchronized
+    var chimeSound: Boolean = true
 
     @set:Synchronized @get:Synchronized
     var coolant: Int = 0
@@ -36,7 +41,7 @@ object State {
     @set:Synchronized @get:Synchronized
     var mil: Boolean = false
 
-    val mph: Mph<Double> = Mph(Config.speedodometerSmoothing)
+    val mph: Mph<Double> = Mph(7)
 
     @set:Synchronized @get:Synchronized
     var oilPressure: Double = 0.0
@@ -45,11 +50,12 @@ object State {
     @set:Synchronized @get:Synchronized
     var lastSavedOdometer: Double = 0.0
 
+    @JsonIgnore
     @set:Synchronized @get:Synchronized
-    var odometer: Double = 0.0
+    var lastSavedTripOdometer: Double = 0.0
 
     @set:Synchronized @get:Synchronized
-    var vssPulsesPerMile: Int = 0
+    var odometer: Double = 0.0
 
     @set:Synchronized @get:Synchronized
     var reverse: Boolean = false
@@ -61,11 +67,10 @@ object State {
     var rpm: Int = 0
 
     @set:Synchronized @get:Synchronized
-    var serialConnected: Boolean = false
+    var screenDimming: Int = 20
 
-    @JsonIgnore
     @set:Synchronized @get:Synchronized
-    var lastSavedTripOdometer: Double = 0.0
+    var serialConnected: Boolean = false
 
     @JsonIgnore
     @set:Synchronized @get:Synchronized
@@ -73,6 +78,9 @@ object State {
 
     @set:Synchronized @get:Synchronized
     var tripOdometer: Double = 0.0
+
+    @set:Synchronized @get:Synchronized
+    var vssPulsesPerMile: Int = 0
 
     private val logs = mutableListOf<String>()
 

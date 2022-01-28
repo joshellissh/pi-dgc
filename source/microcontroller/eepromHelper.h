@@ -6,6 +6,9 @@
 #define TRIP_WHOLE        540
 #define TRIP_TENTHS       810
 #define PULSES_PER_MILE   1040
+#define BLINKER_SOUND     1045
+#define CHIME_SOUND       1050
+#define SCREEN_DIMMING    1055
 
 float odometer = 0.0f;
 float tripOdometer = 0.0f;
@@ -66,27 +69,33 @@ void sendOdometerValues() {
   Serial.println(output);
 }
 
-int readPPM() {
-  int ppm = 8000;
-  EEPROM.get(PULSES_PER_MILE, ppm);
-  return ppm;
+int readValue(int defaultVal, int valueAddress) {
+  int val = defaultVal;
+  EEPROM.get(valueAddress, val);
+  return val;
 }
 
-void writePPM(int ppm) {
-  EEPROM.put(PULSES_PER_MILE, ppm);
+void writeValue(int value, int valueAddress) {
+  EEPROM.put(valueAddress, value);
 }
 
-void sendPPM() {
-  int ppm = readPPM();
+void sendConfig() {
+  int ppm = readValue(8000, PULSES_PER_MILE);
+  bool blinkerSound = readValue(true, BLINKER_SOUND);
+  bool chimeSound = readValue(true, CHIME_SOUND);
+  int screenDimming = readValue(20, SCREEN_DIMMING);
 
   char output[512] = {0};
-  sprintf(output, "ppm:%d", ppm);
+  sprintf(output, "config:%d,%d,%d,%d", ppm, blinkerSound, chimeSound, screenDimming);
   Serial.println(output);
   
   sprintf(
     output, 
-    "log:SERIAL_LOG-PPM value requested. Returning %d",
-    ppm
+    "log:SERIAL_LOG-Config value requested. Returning %d, %d, %d, %d",
+    ppm,
+    blinkerSound,
+    chimeSound,
+    screenDimming
   );
   Serial.println(output);
 }
